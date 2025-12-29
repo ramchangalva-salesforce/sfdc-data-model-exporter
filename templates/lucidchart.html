@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}Lucidchart & ERD - Salesforce Data Model Exporter{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 style="text-align: center; color: #1798c1; margin-bottom: 40px; font-size: 36px;">
+        Lucidchart Import & ERD Visualization
+    </h1>
+
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px; color: white; margin-bottom: 30px;">
+        <h2 style="font-size: 28px; margin-bottom: 15px;">📊 What is ERD?</h2>
+        <p style="font-size: 16px; line-height: 1.8;">
+            An Entity Relationship Diagram (ERD) is a visual representation of your database structure, 
+            showing how different entities (tables/objects) relate to each other. ERDs help you understand 
+            the relationships between data entities, foreign key constraints, and the overall data model 
+            architecture at a glance.
+        </p>
+    </div>
+
+    <div style="margin-bottom: 40px;">
+        <h2 style="color: #1798c1; font-size: 24px; margin-bottom: 20px;">How to Import into Lucidchart</h2>
+        
+        <div style="background-color: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px;">
+            <h3 style="color: #1798c1; margin-bottom: 15px; font-size: 20px;">Step 1: Export Your Data Model</h3>
+            <p style="line-height: 1.8; color: #555; margin-bottom: 15px;">
+                Use the <a href="/exporter" style="color: #1798c1; font-weight: bold;">Data Model Exporter</a> to extract 
+                your Salesforce metadata. The tool will generate a Lucidchart-compatible CSV file in the output directory 
+                with a filename like <code style="background-color: #e9ecef; padding: 2px 6px; border-radius: 3px;">YYYY_MM_DD_salesforce_metadata_lucid.csv</code>.
+            </p>
+        </div>
+
+        <div style="background-color: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px;">
+            <h3 style="color: #1798c1; margin-bottom: 15px; font-size: 20px;">Step 2: Open Lucidchart</h3>
+            <p style="line-height: 1.8; color: #555; margin-bottom: 15px;">
+                Log in to your Lucidchart account and create a new document or open an existing one where you want to 
+                import the ERD.
+            </p>
+        </div>
+
+        <div style="background-color: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px;">
+            <h3 style="color: #1798c1; margin-bottom: 15px; font-size: 20px;">Step 3: Import ERD</h3>
+            <p style="line-height: 1.8; color: #555; margin-bottom: 15px;">
+                You can import the ERD file into Lucidchart from either your <strong>desktop</strong> or <strong>Google Drive</strong>:
+            </p>
+            
+            <div style="margin-top: 20px; margin-bottom: 20px;">
+                <h4 style="color: #1798c1; margin-bottom: 10px; font-size: 18px;">Option A: Import from Desktop</h4>
+                <ol style="line-height: 2; color: #555; padding-left: 20px;">
+                    <li>Download the Lucidchart CSV file using the download button after export completes</li>
+                    <li>In Lucidchart, go to <strong>File</strong> → <strong>Import</strong> → <strong>Database</strong></li>
+                    <li>Select <strong>"Import from CSV"</strong> or <strong>"Import ERD"</strong> option</li>
+                    <li>Choose the downloaded CSV file from your computer</li>
+                    <li>Lucidchart will automatically parse the file and create the ERD</li>
+                </ol>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h4 style="color: #1798c1; margin-bottom: 10px; font-size: 18px;">Option B: Import from Google Drive</h4>
+                <ol style="line-height: 2; color: #555; padding-left: 20px;">
+                    <li>After export completes, click the <strong>"Upload to Google Drive"</strong> button</li>
+                    <li>Authenticate with your Google account (personal account, no workspace credentials needed)</li>
+                    <li>The file will be uploaded to your Google Drive</li>
+                    <li>In Lucidchart, go to <strong>File</strong> → <strong>Import</strong> → <strong>Database</strong></li>
+                    <li>Select <strong>"Import from Google Drive"</strong> or choose <strong>"Import from CSV"</strong> and select the file from your Google Drive</li>
+                    <li>Lucidchart will automatically parse the file and create the ERD</li>
+                </ol>
+            </div>
+        </div>
+
+        <div style="background-color: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px;">
+            <h3 style="color: #1798c1; margin-bottom: 15px; font-size: 20px;">Step 4: Customize Your Diagram</h3>
+            <p style="line-height: 1.8; color: #555;">
+                Once imported, Lucidchart will render your Salesforce data model as an interactive ERD diagram. 
+                You can then customize the layout, colors, and styling. The diagram will show:
+            </p>
+            <ul style="line-height: 2; color: #555; padding-left: 20px; margin-top: 10px;">
+                <li>All Salesforce objects as tables</li>
+                <li>Fields as columns with data types</li>
+                <li>Primary keys and foreign key relationships</li>
+                <li>Relationship lines connecting related objects</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 30px; border-radius: 10px; color: white; margin-bottom: 30px;">
+        <h2 style="font-size: 28px; margin-bottom: 15px;">✨ Benefits of ERD Visualization</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+            <div>
+                <h3 style="font-size: 20px; margin-bottom: 10px;">🔍 Visual Understanding</h3>
+                <p style="line-height: 1.6;">See your entire data model structure at a glance with clear visual representations.</p>
+            </div>
+            <div>
+                <h3 style="font-size: 20px; margin-bottom: 10px;">🔗 Relationship Mapping</h3>
+                <p style="line-height: 1.6;">Understand how objects relate to each other through foreign key relationships.</p>
+            </div>
+            <div>
+                <h3 style="font-size: 20px; margin-bottom: 10px;">📊 Documentation</h3>
+                <p style="line-height: 1.6;">Create professional documentation of your Salesforce data architecture.</p>
+            </div>
+            <div>
+                <h3 style="font-size: 20px; margin-bottom: 10px;">👥 Collaboration</h3>
+                <p style="line-height: 1.6;">Share visual diagrams with team members for better understanding and planning.</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="background-color: #fff3cd; padding: 25px; border-radius: 10px; border-left: 4px solid #ffc107; margin-bottom: 30px;">
+        <h3 style="color: #856404; margin-bottom: 15px; font-size: 20px;">💡 Tips for Best Results</h3>
+        <ul style="line-height: 2; color: #856404; padding-left: 20px;">
+            <li>Ensure your Salesforce user has appropriate permissions to access object metadata</li>
+            <li>Large orgs may take longer to process - be patient during extraction</li>
+            <li>After importing to Lucidchart, you can rearrange tables for better visualization</li>
+            <li>Use Lucidchart's auto-layout features to automatically organize your ERD</li>
+            <li>Export the ERD as PDF or image for documentation purposes</li>
+        </ul>
+    </div>
+
+    <div style="background-color: #f8f9fa; padding: 30px; border-radius: 10px; margin-top: 40px; margin-bottom: 30px;">
+        <h2 style="color: #1798c1; font-size: 24px; margin-bottom: 20px;">📊 Lucidchart Integration</h2>
+        <p style="color: #666; font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
+            Login to Lucidchart to import and view your ERD diagrams directly. You can login before or after export. 
+            Once logged in, you can import your exported CSV files and view your charts all in one place.
+        </p>
+        
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+            <button id="lucidchartLoginBtn" class="btn-lucidchart">
+                🔐 Login to Lucidchart
+            </button>
+            <button id="lucidchartViewBtn" class="btn-lucidchart">
+                👁️ View Charts
+            </button>
+        </div>
+        <p style="color: #666; font-size: 12px; margin-top: 10px;">
+            Click "Login to Lucidchart" to open the Lucidchart login page. After logging in, you can use "View Charts" to access your Lucidchart dashboard.
+        </p>
+        
+        <div id="lucidchartStatus" style="margin-top: 15px; padding: 10px; border-radius: 5px; display: none;"></div>
+        <div id="lucidchartViewer" class="lucidchart-viewer"></div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="/exporter" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-right: 15px;">
+            Start Exporting →
+        </a>
+        <a href="/features" style="display: inline-block; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 15px 40px; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            View Features →
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .btn-lucidchart {
+        background-color: #ff6b35;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s;
+    }
+
+    .btn-lucidchart:hover {
+        background-color: #e55a2b;
+    }
+
+    .btn-lucidchart:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    .lucidchart-viewer {
+        margin-top: 20px;
+        width: 100%;
+        height: 600px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Check if user has exported files (stored in sessionStorage)
+    function getLatestProcessId() {
+        // Try to get from sessionStorage or check for recent exports
+        return sessionStorage.getItem('latest_process_id');
+    }
+
+    function showStatus(message, type = 'info') {
+        const statusDiv = document.getElementById('lucidchartStatus');
+        statusDiv.textContent = message;
+        statusDiv.style.display = 'block';
+        statusDiv.style.padding = '10px';
+        statusDiv.style.borderRadius = '5px';
+        
+        if (type === 'success') {
+            statusDiv.style.backgroundColor = '#d4edda';
+            statusDiv.style.color = '#155724';
+            statusDiv.style.border = '1px solid #c3e6cb';
+        } else if (type === 'error') {
+            statusDiv.style.backgroundColor = '#f8d7da';
+            statusDiv.style.color = '#721c24';
+            statusDiv.style.border = '1px solid #f5c6cb';
+        } else {
+            statusDiv.style.backgroundColor = '#d1ecf1';
+            statusDiv.style.color = '#0c5460';
+            statusDiv.style.border = '1px solid #bee5eb';
+        }
+    }
+
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Lucidchart Login - Simply opens Lucidchart login page
+        const lucidchartLoginBtn = document.getElementById('lucidchartLoginBtn');
+        if (!lucidchartLoginBtn) {
+            console.error('Lucidchart login button not found');
+            return;
+        }
+        
+        lucidchartLoginBtn.addEventListener('click', () => {
+            // Open Lucidchart login page in a new window
+            const loginUrl = 'https://lucid.app/users/login#/login';
+            window.open(loginUrl, '_blank', 'noopener,noreferrer');
+            showStatus('Opening Lucidchart login page. Please log in there, then return to use "View Charts".', 'info');
+        });
+
+        // Lucidchart View Charts - Opens Lucidchart dashboard
+        const lucidchartViewBtn = document.getElementById('lucidchartViewBtn');
+        if (!lucidchartViewBtn) {
+            console.error('Lucidchart view button not found');
+            return;
+        }
+        
+        lucidchartViewBtn.addEventListener('click', () => {
+            // Open Lucidchart dashboard in a new window
+            const dashboardUrl = 'https://lucid.app/documents';
+            window.open(dashboardUrl, '_blank', 'noopener,noreferrer');
+            showStatus('Opening Lucidchart dashboard. Make sure you are logged in to view your charts.', 'info');
+        });
+
+    }); // End DOMContentLoaded
+</script>
+{% endblock %}
+

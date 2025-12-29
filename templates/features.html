@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Features - Salesforce Data Model Exporter{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 style="text-align: center; color: #1798c1; margin-bottom: 40px; font-size: 36px;">
+        Features
+    </h1>
+
+    <div style="margin-bottom: 50px;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 10px; color: white; margin-bottom: 30px;">
+            <h2 style="font-size: 28px; margin-bottom: 15px;">🔍 Comprehensive Metadata Extraction</h2>
+            <p style="font-size: 16px; line-height: 1.8;">
+                Extract complete metadata from your Salesforce org including all custom and standard objects, 
+                fields, data types, relationships, and field properties. The tool retrieves information about 
+                field lengths, precision, scale, reference relationships, and more.
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 25px; border-radius: 10px; color: white; margin-bottom: 30px;">
+            <h2 style="font-size: 28px; margin-bottom: 15px;">📊 Multiple Org Support</h2>
+            <p style="font-size: 16px; line-height: 1.8;">
+                Work with various Salesforce orgs including production, sandbox, and custom orgs like Org62, 
+                OrgSF, Finance Force, and more. Simply provide your instance URL and credentials to connect 
+                to any Salesforce environment.
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 25px; border-radius: 10px; color: white; margin-bottom: 30px;">
+            <h2 style="font-size: 28px; margin-bottom: 15px;">💾 CSV Export Format</h2>
+            <p style="font-size: 16px; line-height: 1.8;">
+                Export your data model to a clean, readable CSV format that includes all object and field 
+                information. The CSV file is structured for easy analysis and can be opened in Excel, 
+                Google Sheets, or any spreadsheet application.
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); padding: 25px; border-radius: 10px; color: white; margin-bottom: 30px;">
+            <h2 style="font-size: 28px; margin-bottom: 15px;">🎨 Lucidchart ERD Compatibility</h2>
+            <p style="font-size: 16px; line-height: 1.8;">
+                Generate Lucidchart-compatible CSV files that can be directly imported into Lucidchart's 
+                ERD import feature. The tool automatically formats the data with proper table schemas, 
+                column definitions, data types, and relationship mappings for seamless visualization.
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); padding: 25px; border-radius: 10px; color: white; margin-bottom: 30px;">
+            <h2 style="font-size: 28px; margin-bottom: 15px;">🔄 Real-time Processing</h2>
+            <p style="font-size: 16px; line-height: 1.8;">
+                Monitor the extraction process in real-time with live log updates. See which objects are 
+                being processed, track progress, and view any errors or warnings as they occur. The process 
+                runs in the background, allowing you to monitor status without blocking the interface.
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); padding: 25px; border-radius: 10px; color: white; margin-bottom: 30px;">
+            <h2 style="font-size: 28px; margin-bottom: 15px;">🛑 Process Control</h2>
+            <p style="font-size: 16px; line-height: 1.8;">
+                Full control over the extraction process with the ability to start, monitor, and terminate 
+                operations as needed. Each process is assigned a unique ID for tracking, and you can manage 
+                multiple extraction tasks simultaneously.
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); padding: 25px; border-radius: 10px; color: white; margin-bottom: 30px;">
+            <h2 style="font-size: 28px; margin-bottom: 15px;">🔐 Secure Authentication</h2>
+            <p style="font-size: 16px; line-height: 1.8;">
+                Uses OAuth2 password flow for secure authentication with Salesforce. Your credentials are 
+                used only for the authentication process and are never stored or logged. All communication 
+                with Salesforce APIs is encrypted and secure.
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); padding: 25px; border-radius: 10px; color: white;">
+            <h2 style="font-size: 28px; margin-bottom: 15px;">📈 Data Type Mapping</h2>
+            <p style="font-size: 16px; line-height: 1.8;">
+                Intelligent mapping of Salesforce data types to database-compatible formats. The tool 
+                automatically converts Salesforce field types (like reference, id, datetime, etc.) to 
+                appropriate database types (INT, DATETIME, VARCHAR, etc.) with proper constraints and 
+                foreign key relationships.
+            </p>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="/exporter" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            Start Using the Exporter →
+        </a>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Select App - Salesforce Data Model Exporter{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 style="text-align: center; color: #1798c1; margin-bottom: 40px; font-size: 36px;">
+        Select Salesforce App
+    </h1>
+
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px; color: white; margin-bottom: 30px;">
+        <h2 style="font-size: 24px; margin-bottom: 15px;">✅ Authentication Successful!</h2>
+        <p style="font-size: 16px; line-height: 1.8;">
+            You have successfully authenticated with Salesforce. Please select an app below to extract its data model.
+            Only objects from the selected app will be included in the ERD diagram.
+        </p>
+    </div>
+
+    <div style="background-color: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
+        <form id="appSelectionForm">
+            <input type="hidden" id="sessionId" value="{{ session_id }}">
+            
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label for="appSelect" style="font-weight: bold; font-size: 18px; margin-bottom: 15px; display: block; color: #1798c1;">
+                    Select App:
+                </label>
+                <select id="appSelect" name="app_namespace" required 
+                        style="width: 100%; padding: 12px; border: 2px solid #1798c1; border-radius: 5px; font-size: 16px; background-color: white;">
+                    <option value="">Loading apps...</option>
+                </select>
+                <small style="color: #666; font-size: 14px; display: block; margin-top: 10px;">
+                    <strong>Note:</strong> Select "All Objects (No Filter)" to extract metadata for all objects in the org.
+                </small>
+            </div>
+
+            <div id="statusMessage" style="display: none; padding: 15px; border-radius: 5px; margin-bottom: 20px;"></div>
+
+            <div class="button-group" style="display: flex; gap: 15px; justify-content: center;">
+                <button type="submit" class="btn-primary" id="startBtn" style="padding: 15px 40px; font-size: 18px; min-width: 250px;" disabled>
+                    Retrieve Selected App Data Model
+                </button>
+                <a href="/exporter" class="btn-secondary" style="padding: 15px 40px; font-size: 18px; text-decoration: none; display: inline-block; text-align: center; min-width: 150px;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .btn-primary {
+        background-color: #1798c1;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background-color: #147a9e;
+    }
+
+    .btn-primary:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .status-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .status-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        const sessionId = document.getElementById('sessionId').value;
+        const appSelect = document.getElementById('appSelect');
+        const startBtn = document.getElementById('startBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const form = document.getElementById('appSelectionForm');
+
+        // Load apps
+        try {
+            statusMessage.textContent = 'Loading available apps...';
+            statusMessage.className = 'status-success';
+            statusMessage.style.display = 'block';
+
+            const response = await fetch(`/salesforce-apps?session_id=${encodeURIComponent(sessionId)}`);
+            
+            if (!response.ok) {
+                throw new Error('Failed to load apps');
+            }
+
+            const data = await response.json();
+            const apps = data.apps || [];
+
+            // Clear loading option
+            appSelect.innerHTML = '';
+
+            // Add apps to dropdown
+            apps.forEach(app => {
+                const option = document.createElement('option');
+                // Use namespacePrefix if available, otherwise use 'all' (for apps without namespace)
+                // Apps without namespace use standard objects, so we can't filter by namespace
+                option.value = app.namespacePrefix || 'all';
+                option.textContent = app.label || app.name || 'All Objects';
+                option.dataset.appName = app.label || app.name || 'All Objects';
+                option.dataset.hasNamespace = app.namespacePrefix ? 'true' : 'false';
+                option.dataset.appId = app.id || '';
+                appSelect.appendChild(option);
+            });
+
+            statusMessage.textContent = `Loaded ${apps.length} app(s). Please select an app to continue.`;
+            statusMessage.className = 'status-success';
+            startBtn.disabled = false;
+        } catch (error) {
+            statusMessage.textContent = `Error loading apps: ${error.message}. You can still proceed with "All Objects".`;
+            statusMessage.className = 'status-error';
+            
+            // Add default option
+            appSelect.innerHTML = '<option value="all">All Objects (No Filter)</option>';
+            startBtn.disabled = false;
+        }
+
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const selectedOption = appSelect.options[appSelect.selectedIndex];
+            const appNamespace = appSelect.value;
+            const appName = selectedOption.dataset.appName || selectedOption.textContent;
+
+            if (!appNamespace) {
+                statusMessage.textContent = 'Please select an app.';
+                statusMessage.className = 'status-error';
+                statusMessage.style.display = 'block';
+                return;
+            }
+
+            startBtn.disabled = true;
+            startBtn.textContent = 'Starting Extraction...';
+            statusMessage.textContent = 'Starting metadata extraction...';
+            statusMessage.className = 'status-success';
+            statusMessage.style.display = 'block';
+
+            try {
+                const formData = new FormData();
+                formData.append('session_id', sessionId);
+                formData.append('app_namespace', appNamespace);
+                formData.append('app_name', appName);
+
+                const response = await fetch('/start-extraction', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: response.statusText }));
+                    throw new Error(errorData.detail || 'Failed to start extraction');
+                }
+
+                const data = await response.json();
+                
+                // Redirect to exporter page with process_id
+                window.location.href = `/exporter?process_id=${data.process_id}`;
+            } catch (error) {
+                statusMessage.textContent = `Error: ${error.message}`;
+                statusMessage.className = 'status-error';
+                startBtn.disabled = false;
+                startBtn.textContent = 'Retrieve Selected App Data Model';
+            }
+        });
+    });
+</script>
+{% endblock %}
+

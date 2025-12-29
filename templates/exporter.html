@@ -1,0 +1,1317 @@
+{% extends "base.html" %}
+
+{% block title %}Data Model Exporter - Salesforce Data Model Exporter{% endblock %}
+
+{% block extra_css %}
+<style>
+    h1 {
+        text-align: center;
+        color: #1798c1;
+        margin-bottom: 20px;
+        font-size: 28px;
+    }
+
+    .description {
+        background-color: #f0f8ff;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 30px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+        font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+        outline: none;
+        border-color: #1798c1;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary {
+        background-color: #b0e0e6;
+        color: #000;
+    }
+
+    .btn-primary:hover {
+        background-color: #87ceeb;
+    }
+
+    .btn-danger {
+        background-color: #ff4c4c;
+        color: #fff;
+    }
+
+    .btn-danger:hover {
+        background-color: #ff3333;
+    }
+
+    .btn-danger:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    .log-section {
+        margin-top: 30px;
+    }
+
+    .log-label {
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    #logOutput {
+        width: 100%;
+        height: 300px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        display: block;
+        min-height: 300px;
+        word-wrap: break-word;
+    }
+
+    .status-indicator {
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        display: none;
+    }
+
+    .status-starting {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-running {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-completed {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-terminated {
+        background-color: #e2e3e5;
+        color: #383d41;
+    }
+
+    .download-section {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        display: none;
+    }
+
+    .download-section h3 {
+        color: #1798c1;
+        margin-bottom: 15px;
+        font-size: 20px;
+    }
+
+    .download-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .btn-download {
+        background-color: #28a745;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s;
+    }
+
+    .btn-download:hover {
+        background-color: #218838;
+    }
+
+    .btn-drive {
+        background-color: #4285f4;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s;
+    }
+
+    .btn-drive:hover {
+        background-color: #357ae8;
+    }
+
+    .btn-drive:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>SALESFORCE DATA MODEL EXPORTER</h1>
+    
+    <div class="description">
+        This is a lightweight application which will help you extract data models from existing salesforce solutions including existing Orgs - Like Org62, OrgSF, Finance Force etc. The tool exports the data model into a readable CSV file. In addition, this CSV is a Lucid chart compatible file; i.e., if this file is exported into Lucid chart through an ERD import option - the entire data model will be rendered into Lucid with a drag and drop functionality.
+    </div>
+
+    <div id="statusIndicator" class="status-indicator"></div>
+
+    <form id="credentialsForm">
+        <!-- Authentication Method Toggle -->
+        <div class="form-group">
+            <label style="font-weight: bold; margin-bottom: 10px; display: block;">Authentication Method:</label>
+            <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="radio" name="authMethod" value="password" id="authMethodPassword" checked style="margin-right: 8px;">
+                    <span>Password Flow (No MFA)</span>
+                </label>
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="radio" name="authMethod" value="oauth" id="authMethodOAuth" style="margin-right: 8px;">
+                    <span>OAuth2 Flow (Supports MFA)</span>
+                </label>
+            </div>
+            <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                <strong>Password Flow:</strong> Use if you don't have MFA enabled or can append security token to password.<br>
+                <strong>OAuth2 Flow:</strong> Use if you have MFA enabled. You'll be redirected to Salesforce login page where you can enter your MFA verification code.
+            </small>
+            
+            <!-- OAuth2 Redirect URI Info -->
+            <div id="oauthRedirectUriInfo" style="display: none; margin-top: 15px; padding: 12px; background-color: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
+                <strong style="color: #1976d2;">⚠️ Important: Configure Callback URL in Salesforce</strong>
+                <p style="margin: 8px 0 4px 0; font-size: 12px;">Before using OAuth2 Flow, add this exact URL to your Salesforce External Client App:</p>
+                <div id="redirectUriDisplay" style="font-family: monospace; background: white; padding: 8px; border-radius: 3px; word-break: break-all; font-size: 11px; color: #d32f2f; font-weight: bold;">
+                    Loading...
+                </div>
+                <p style="margin: 8px 0 0 0; font-size: 11px; color: #666;">
+                    Go to: <strong>Setup → External Client Apps → Your External Client App → Manager → OAuth Settings</strong><br>
+                    Add the URL above to the <strong>Callback URL</strong> field, then click <strong>Save</strong>.
+                </p>
+                <div style="margin-top: 12px; padding: 10px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 3px;">
+                    <strong style="color: #856404;">📱 MFA Verification:</strong>
+                    <p style="margin: 5px 0 0 0; font-size: 11px; color: #856404;">
+                        When you click "Login & Load Apps", you'll be redirected to Salesforce's login page.<br>
+                        <strong>Enter your MFA verification code on that Salesforce page</strong> (not in this form).<br>
+                        The verification code will be sent to your email or authenticator app.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="clientId">Client ID (Consumer Key):</label>
+            <input type="text" id="clientId" name="client_id" required
+                   value="{{ default_client_id }}"
+                   placeholder="Enter your Salesforce External Client App Consumer Key">
+            <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                Get this from: Setup → External Client Apps → Your External Client App → Manager → OAuth Settings
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="clientSecret">Client Secret (Consumer Secret):</label>
+            <input type="password" id="clientSecret" name="client_secret" required
+                   value="{{ default_client_secret }}"
+                   placeholder="Enter your Salesforce External Client App Consumer Secret">
+            <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                Get this from: Setup → External Client Apps → Your External Client App → Manager → OAuth Settings → Reveal
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="environment">Environment:</label>
+            <select id="environment" name="environment" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; margin-bottom: 10px;">
+                <option value="DEV">DEV</option>
+                <option value="STG">STG (Staging)</option>
+                <option value="PROD">PROD (Production)</option>
+            </select>
+            <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                Select environment to automatically set the Instance URL
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="instanceUrl">Instance URL:</label>
+            <input type="text" id="instanceUrl" name="instance_url" required 
+                   value="{{ default_instance_url }}"
+                   placeholder="https://login.salesforce.com, https://test.salesforce.com, or https://your-domain.my.salesforce.com">
+            <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                Examples: https://login.salesforce.com (Production), https://test.salesforce.com (Sandbox), 
+                or your My Domain URL. This will be updated automatically based on Environment selection.
+            </small>
+            <div id="instanceUrlDisplay" style="margin-top: 8px; padding: 8px; background-color: #e7f3ff; border-left: 4px solid #1798c1; border-radius: 3px; font-size: 12px; display: none;">
+                <strong>Current Instance URL:</strong> <span id="instanceUrlValue">{{ default_instance_url }}</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="appSelect">Salesforce App (Optional):</label>
+            <select id="appSelect" name="app_namespace" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                <option value="all">All Objects (No Filter)</option>
+            </select>
+            <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                <strong>Select an app to filter:</strong> Only objects from the selected app will be included in the ERD diagram.<br>
+                <strong>For both flows:</strong> Click "Login & Load Apps" button below to authenticate and load available apps, then select an app and click "Retrieve Selected App Data Model".
+            </small>
+            <div id="loadAppsStatus" style="margin-top: 10px; padding: 8px; border-radius: 4px; display: none; font-size: 12px;"></div>
+        </div>
+
+        <!-- Password Flow Fields -->
+        <div id="passwordFlowFields">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" 
+                       placeholder="Enter your Salesforce username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password + Security Token:</label>
+                <input type="password" id="password" name="password" 
+                       placeholder="Enter your password + security token (no space between them)">
+                <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                    <strong>Important:</strong> Append your security token to your password with no space between them.<br>
+                    Example: If your password is "mypass123" and security token is "ABC123", enter: <code>mypass123ABC123</code><br>
+                    <strong>Get your security token:</strong> Setup → My Personal Information → Reset My Security Token (check your email)
+                </small>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button type="button" class="btn-secondary" id="loginLoadAppsBtn" style="display: none; background-color: #6c757d;">
+                🔐 Login & Load Apps
+            </button>
+            <button type="submit" class="btn-primary" id="retrieveBtn">Retrieve Metadata</button>
+            <button type="button" class="btn-primary" id="retrieveOAuthBtn" style="display: none;">Retrieve Selected App Data Model</button>
+            <button type="button" class="btn-danger" id="terminateBtn" disabled>Terminate Process</button>
+            <button type="button" class="btn-secondary" id="signOutBtn" style="display: none; background-color: #6c757d;">
+                🚪 Sign Out
+            </button>
+        </div>
+    </form>
+
+    <div class="log-section">
+        <div class="log-label">Log Output:</div>
+        <div id="logOutput"></div>
+    </div>
+
+    <div id="downloadSection" class="download-section">
+        <h3>Download Files</h3>
+        <div class="download-buttons">
+            <a id="downloadMetadataBtn" class="btn-download" href="#" style="display: none;">
+                📥 Download Metadata CSV
+            </a>
+            <a id="downloadLucidBtn" class="btn-download" href="#" style="display: none;">
+                📥 Download Lucidchart CSV
+            </a>
+            <button id="uploadDriveBtn" class="btn-drive" style="display: none;">
+                ☁️ Upload to Google Drive
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentProcessId = null;
+    let statusCheckInterval = null;
+
+    const form = document.getElementById('credentialsForm');
+    const retrieveBtn = document.getElementById('retrieveBtn');
+    const retrieveOAuthBtn = document.getElementById('retrieveOAuthBtn');
+    const terminateBtn = document.getElementById('terminateBtn');
+    const signOutBtn = document.getElementById('signOutBtn');
+    const logOutput = document.getElementById('logOutput');
+    const statusIndicator = document.getElementById('statusIndicator');
+    const passwordFlowFields = document.getElementById('passwordFlowFields');
+    const authMethodPassword = document.getElementById('authMethodPassword');
+    const authMethodOAuth = document.getElementById('authMethodOAuth');
+    const usernameField = document.getElementById('username');
+    const passwordField = document.getElementById('password');
+    const environmentSelect = document.getElementById('environment');
+    const instanceUrlInput = document.getElementById('instanceUrl');
+    const instanceUrlDisplay = document.getElementById('instanceUrlDisplay');
+    const instanceUrlValue = document.getElementById('instanceUrlValue');
+    
+    // Environment-specific instance URLs
+    const envUrls = {
+        'DEV': 'https://cloudblazer2-dev-ed.develop.my.salesforce.com',
+        'STG': 'https://test.salesforce.com',
+        'PROD': 'https://login.salesforce.com'
+    };
+    
+    // Handle environment dropdown change
+    if (environmentSelect && instanceUrlInput) {
+        environmentSelect.addEventListener('change', function() {
+            const selectedEnv = this.value;
+            const instanceUrl = envUrls[selectedEnv] || envUrls['DEV'];
+            
+            instanceUrlInput.value = instanceUrl;
+            
+            if (instanceUrlValue) {
+                instanceUrlValue.textContent = instanceUrl;
+            }
+            
+            if (instanceUrlDisplay) {
+                instanceUrlDisplay.style.display = 'block';
+            }
+            
+            addLog(`Environment changed to ${selectedEnv}. Instance URL updated to: ${instanceUrl}`);
+        });
+        
+        // Set initial environment based on current instance URL
+        const currentUrl = instanceUrlInput.value;
+        if (currentUrl.includes('cloudblazer2-dev-ed.develop.my.salesforce.com')) {
+            environmentSelect.value = 'DEV';
+        } else if (currentUrl.includes('test.salesforce.com')) {
+            environmentSelect.value = 'STG';
+        } else if (currentUrl.includes('login.salesforce.com')) {
+            environmentSelect.value = 'PROD';
+        } else {
+            // Default to DEV if URL doesn't match
+            environmentSelect.value = 'DEV';
+        }
+        
+        // Show initial instance URL
+        if (instanceUrlDisplay && instanceUrlValue) {
+            instanceUrlValue.textContent = instanceUrlInput.value;
+            instanceUrlDisplay.style.display = 'block';
+        }
+    }
+
+    // Load and display redirect URI for OAuth2
+    async function loadRedirectUri() {
+        try {
+            const response = await fetch('/salesforce-redirect-uri');
+            const data = await response.json();
+            const redirectUriDisplay = document.getElementById('redirectUriDisplay');
+            if (redirectUriDisplay) {
+                redirectUriDisplay.textContent = data.redirect_uri;
+            }
+        } catch (error) {
+            console.error('Error loading redirect URI:', error);
+            const redirectUriDisplay = document.getElementById('redirectUriDisplay');
+            if (redirectUriDisplay) {
+                redirectUriDisplay.textContent = 'Error loading redirect URI. Check server logs.';
+            }
+        }
+    }
+
+    // Toggle between Password Flow and OAuth2 Flow
+    function toggleAuthMethod() {
+        const isPasswordFlow = authMethodPassword.checked;
+        const oauthRedirectUriInfo = document.getElementById('oauthRedirectUriInfo');
+        const loginLoadAppsBtn = document.getElementById('loginLoadAppsBtn');
+        
+        if (isPasswordFlow) {
+            // Show password flow fields
+            passwordFlowFields.style.display = 'block';
+            usernameField.required = true;
+            passwordField.required = true;
+            retrieveBtn.textContent = 'Retrieve Selected App Data Model';
+            retrieveBtn.style.display = 'inline-block';
+            if (loginLoadAppsBtn) {
+                loginLoadAppsBtn.style.display = 'inline-block';
+            }
+            // Hide OAuth retrieve button for Password Flow
+            if (retrieveOAuthBtn) {
+                retrieveOAuthBtn.style.display = 'none';
+            }
+            // Hide Sign Out button when switching to Password Flow (will show after login)
+            if (signOutBtn) {
+                signOutBtn.style.display = 'none';
+            }
+            if (oauthRedirectUriInfo) {
+                oauthRedirectUriInfo.style.display = 'none';
+            }
+        } else {
+            // Hide password flow fields
+            passwordFlowFields.style.display = 'none';
+            usernameField.required = false;
+            passwordField.required = false;
+            retrieveBtn.textContent = '🔐 Login & Load Apps';
+            retrieveBtn.style.display = 'inline-block';
+            if (loginLoadAppsBtn) {
+                loginLoadAppsBtn.style.display = 'none';
+            }
+            // Hide OAuth retrieve button initially - it will show after apps are loaded
+            if (retrieveOAuthBtn) {
+                retrieveOAuthBtn.style.display = 'none';
+                retrieveOAuthBtn.disabled = true;
+            }
+            // Hide Sign Out button initially for OAuth2 flow (will show after authentication)
+            if (signOutBtn) {
+                signOutBtn.style.display = 'none';
+            }
+            if (oauthRedirectUriInfo) {
+                oauthRedirectUriInfo.style.display = 'block';
+            }
+            // Load redirect URI if not already loaded
+            const redirectUriDisplay = document.getElementById('redirectUriDisplay');
+            if (redirectUriDisplay && redirectUriDisplay.textContent === 'Loading...') {
+                loadRedirectUri();
+            }
+        }
+    }
+
+    // Initialize toggle on page load
+    toggleAuthMethod();
+    
+    // Load redirect URI on page load (for OAuth2 info)
+    loadRedirectUri();
+
+    // Add event listeners for auth method toggle
+    authMethodPassword.addEventListener('change', toggleAuthMethod);
+    authMethodOAuth.addEventListener('change', toggleAuthMethod);
+
+    // Store session_id for OAuth2 flow
+    let oauthSessionId = null;
+    
+    // Check if we have a session_id from OAuth callback to load apps
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionIdFromUrl = urlParams.get('session_id');
+    if (sessionIdFromUrl) {
+        oauthSessionId = sessionIdFromUrl;
+        // Ensure OAuth2 flow is selected (not Password Flow)
+        authMethodOAuth.checked = true;
+        authMethodPassword.checked = false;
+        // Update UI to show OAuth2 flow state
+        toggleAuthMethod();
+        addLog('OAuth authentication successful. Loading apps...');
+        // Load apps using session_id
+        loadAppsFromSession(sessionIdFromUrl);
+        // Clean up URL but keep session_id in memory
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
+    // Check if we have a process_id from OAuth callback (legacy support)
+    const processIdFromUrl = urlParams.get('process_id');
+    if (processIdFromUrl) {
+        currentProcessId = processIdFromUrl;
+        sessionStorage.setItem('latest_process_id', currentProcessId);
+        addLog('OAuth authentication successful. Process ID: ' + currentProcessId);
+        startStatusPolling(currentProcessId);
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
+    // Function to load apps from OAuth session
+    async function loadAppsFromSession(sessionId) {
+        const appSelect = document.getElementById('appSelect');
+        const loadAppsStatus = document.getElementById('loadAppsStatus');
+        
+        try {
+            loadAppsStatus.textContent = 'Loading apps...';
+            loadAppsStatus.style.display = 'block';
+            loadAppsStatus.style.backgroundColor = '#d1ecf1';
+            loadAppsStatus.style.color = '#0c5460';
+            loadAppsStatus.style.border = '1px solid #bee5eb';
+            
+            const response = await fetch(`/salesforce-apps?session_id=${encodeURIComponent(sessionId)}`);
+            
+            if (!response.ok) {
+                throw new Error('Failed to load apps');
+            }
+            
+            const data = await response.json();
+            const apps = data.apps || [];
+            
+            // Clear existing options
+            appSelect.innerHTML = '';
+            
+            // Add apps to dropdown
+            apps.forEach(app => {
+                const option = document.createElement('option');
+                option.value = app.namespacePrefix || 'all';
+                option.textContent = app.label || app.name || 'All Objects';
+                option.dataset.appName = app.label || app.name || 'All Objects';
+                option.dataset.hasNamespace = app.namespacePrefix ? 'true' : 'false';
+                option.dataset.appId = app.id || '';
+                appSelect.appendChild(option);
+            });
+            
+            loadAppsStatus.textContent = `✅ Successfully loaded ${apps.length} app(s). Please select an app to filter objects.`;
+            loadAppsStatus.style.backgroundColor = '#d4edda';
+            loadAppsStatus.style.color = '#155724';
+            loadAppsStatus.style.border = '1px solid #c3e6cb';
+            addLog(`Loaded ${apps.length} app(s). Select an app to filter objects.`);
+            
+            // Ensure OAuth2 flow is selected (not Password Flow)
+            if (!authMethodOAuth.checked) {
+                authMethodOAuth.checked = true;
+                authMethodPassword.checked = false;
+                toggleAuthMethod();
+            }
+            
+            // Hide the "Login & Load Apps" button and show "Retrieve Selected App Data Model" button
+            retrieveBtn.style.display = 'none';
+            if (retrieveOAuthBtn) {
+                retrieveOAuthBtn.style.display = 'inline-block';
+                retrieveOAuthBtn.disabled = false;
+                addLog('✅ "Retrieve Selected App Data Model" button is now available. Select an app and click the button to start extraction.');
+            } else {
+                // Fallback: update the main retrieve button
+                retrieveBtn.disabled = false;
+                retrieveBtn.textContent = 'Retrieve Selected App Data Model';
+                retrieveBtn.style.display = 'inline-block';
+            }
+            
+            // Show Sign Out button after OAuth2 authentication
+            if (signOutBtn) {
+                signOutBtn.style.display = 'inline-block';
+            }
+        } catch (error) {
+            loadAppsStatus.textContent = `⚠️ Warning: Could not load apps. You can still proceed with "All Objects". Error: ${error.message}`;
+            loadAppsStatus.style.backgroundColor = '#fff3cd';
+            loadAppsStatus.style.color = '#856404';
+            loadAppsStatus.style.border = '1px solid #ffeaa7';
+            addLog(`Error loading apps: ${error.message}. You can still proceed with "All Objects".`);
+            
+            // Still show the retrieve button
+            // Ensure we're in OAuth2 flow state
+            if (!authMethodOAuth.checked) {
+                authMethodOAuth.checked = true;
+                authMethodPassword.checked = false;
+                toggleAuthMethod();
+            }
+            retrieveBtn.style.display = 'none';
+            if (retrieveOAuthBtn) {
+                retrieveOAuthBtn.style.display = 'inline-block';
+                retrieveOAuthBtn.disabled = false;
+            } else {
+                // Fallback: update the main retrieve button
+                retrieveBtn.disabled = false;
+                retrieveBtn.textContent = 'Retrieve Selected App Data Model';
+                retrieveBtn.style.display = 'inline-block';
+            }
+        }
+    }
+    
+    function addLog(message) {
+        logOutput.textContent += message + '\n';
+        logOutput.scrollTop = logOutput.scrollHeight;
+    }
+
+    // Function to load apps after authentication
+    async function loadApps(accessToken, instanceUrl) {
+        const appSelect = document.getElementById('appSelect');
+        const loadAppsStatus = document.getElementById('loadAppsStatus');
+        
+        try {
+            loadAppsStatus.textContent = 'Loading apps...';
+            loadAppsStatus.style.display = 'block';
+            loadAppsStatus.style.backgroundColor = '#d1ecf1';
+            loadAppsStatus.style.color = '#0c5460';
+            loadAppsStatus.style.border = '1px solid #bee5eb';
+            
+            const response = await fetch(`/salesforce-apps?access_token=${encodeURIComponent(accessToken)}&instance_url=${encodeURIComponent(instanceUrl)}`);
+            
+            if (!response.ok) {
+                throw new Error('Failed to load apps');
+            }
+            
+            const data = await response.json();
+            const apps = data.apps || [];
+            
+            // Clear existing options
+            appSelect.innerHTML = '';
+            
+            // Add apps to dropdown
+            apps.forEach(app => {
+                const option = document.createElement('option');
+                // Use namespacePrefix if available, otherwise use 'all' (for apps without namespace)
+                // Apps without namespace use standard objects, so we can't filter by namespace
+                option.value = app.namespacePrefix || 'all';
+                option.textContent = app.label || app.name || 'All Objects';
+                option.dataset.appName = app.label || app.name || 'All Objects';
+                option.dataset.hasNamespace = app.namespacePrefix ? 'true' : 'false';
+                option.dataset.appId = app.id || '';
+                appSelect.appendChild(option);
+            });
+            
+            loadAppsStatus.textContent = `✅ Successfully loaded ${apps.length} app(s). Please select an app to filter objects.`;
+            loadAppsStatus.style.backgroundColor = '#d4edda';
+            loadAppsStatus.style.color = '#155724';
+            loadAppsStatus.style.border = '1px solid #c3e6cb';
+            addLog(`Loaded ${apps.length} app(s). Select an app to filter objects.`);
+        } catch (error) {
+            loadAppsStatus.textContent = `⚠️ Warning: Could not load apps. You can still proceed with "All Objects". Error: ${error.message}`;
+            loadAppsStatus.style.backgroundColor = '#fff3cd';
+            loadAppsStatus.style.color = '#856404';
+            loadAppsStatus.style.border = '1px solid #ffeaa7';
+            addLog('Warning: Could not load apps. You can still proceed with "All Objects".');
+            console.error('Error loading apps:', error);
+        }
+    }
+
+    // Login & Load Apps button handler (Password Flow only)
+    const loginLoadAppsBtn = document.getElementById('loginLoadAppsBtn');
+    if (loginLoadAppsBtn) {
+        loginLoadAppsBtn.addEventListener('click', async () => {
+            const clientId = document.getElementById('clientId').value.trim();
+            const clientSecret = document.getElementById('clientSecret').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const instanceUrl = document.getElementById('instanceUrl').value.trim();
+            
+            // Validate fields
+            if (!clientId || !clientSecret || !username || !password || !instanceUrl) {
+                addLog('Error: Please fill in all credentials to load apps.');
+                return;
+            }
+            
+            if (!instanceUrl.startsWith('https://')) {
+                addLog('Error: Instance URL must start with https://');
+                return;
+            }
+            
+            loginLoadAppsBtn.disabled = true;
+            loginLoadAppsBtn.textContent = 'Authenticating...';
+            addLog('Authenticating to load apps...');
+            
+            try {
+                // Authenticate to get access token
+                const credentials = {
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                    username: username,
+                    password: password,
+                    instance_url: instanceUrl
+                };
+                
+                const response = await fetch('/authenticate-for-apps', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(credentials)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: response.statusText }));
+                    throw new Error(errorData.detail || 'Authentication failed');
+                }
+                
+                const data = await response.json();
+                addLog('Authentication successful. Loading apps...');
+                
+                // Load apps using the access token
+                await loadApps(data.access_token, data.instance_url);
+                
+                loginLoadAppsBtn.textContent = '✅ Apps Loaded';
+                loginLoadAppsBtn.style.backgroundColor = '#28a745';
+                
+            } catch (error) {
+                addLog('Error: ' + error.message);
+                loginLoadAppsBtn.disabled = false;
+                loginLoadAppsBtn.textContent = '🔐 Login & Load Apps';
+                loginLoadAppsBtn.style.backgroundColor = '#6c757d';
+            }
+        });
+    }
+
+    function updateStatus(status, message = '') {
+        statusIndicator.className = 'status-indicator';
+        statusIndicator.style.display = 'block';
+        
+        switch(status) {
+            case 'starting':
+                statusIndicator.className += ' status-starting';
+                statusIndicator.textContent = 'Status: Starting...';
+                break;
+            case 'running':
+                statusIndicator.className += ' status-running';
+                statusIndicator.textContent = 'Status: Running...';
+                break;
+            case 'completed':
+                statusIndicator.className += ' status-completed';
+                statusIndicator.textContent = 'Status: Completed successfully!';
+                break;
+            case 'error':
+                statusIndicator.className += ' status-error';
+                // Display error message, truncate if too long
+                const errorMsg = message || 'An error occurred';
+                const truncatedMsg = errorMsg.length > 100 ? errorMsg.substring(0, 100) + '...' : errorMsg;
+                statusIndicator.textContent = 'Status: Error - ' + truncatedMsg;
+                statusIndicator.title = errorMsg; // Show full message on hover
+                break;
+            case 'terminated':
+                statusIndicator.className += ' status-terminated';
+                statusIndicator.textContent = 'Status: Terminated';
+                break;
+            default:
+                statusIndicator.style.display = 'none';
+        }
+    }
+
+    function startStatusPolling(processId) {
+        if (statusCheckInterval) {
+            clearInterval(statusCheckInterval);
+        }
+        
+        statusCheckInterval = setInterval(async () => {
+            try {
+                const response = await fetch(`/status/${processId}`);
+                const data = await response.json();
+                
+                if (data.status === 'not_found') {
+                    clearInterval(statusCheckInterval);
+                    return;
+                }
+
+                // Update logs - replace all logs to ensure consistency
+                const newLogs = data.logs || [];
+                if (newLogs.length > 0) {
+                    // Replace entire log content to ensure all logs are displayed
+                    logOutput.textContent = newLogs.join('\n');
+                    logOutput.scrollTop = logOutput.scrollHeight;
+                }
+
+                // Update status
+                updateStatus(data.status, data.error || '');
+
+                // Update button states
+                if (data.status === 'completed' || data.status === 'error' || data.status === 'terminated') {
+                    retrieveBtn.disabled = false;
+                    if (retrieveOAuthBtn) {
+                        retrieveOAuthBtn.disabled = false;
+                    }
+                    terminateBtn.disabled = true;
+                    clearInterval(statusCheckInterval);
+                    
+                    // Show download buttons if files are available
+                    if (data.status === 'completed') {
+                        showDownloadButtons(processId, data);
+                    }
+                } else if (data.status === 'running' || data.status === 'starting') {
+                    retrieveBtn.disabled = true;
+                    if (retrieveOAuthBtn) {
+                        retrieveOAuthBtn.disabled = true;
+                    }
+                    terminateBtn.disabled = false;
+                }
+                
+            } catch (error) {
+                console.error('Error checking status:', error);
+            }
+        }, 1000); // Poll every second
+    }
+
+    // Add click handler for OAuth retrieve button (works on same page after OAuth auth)
+    if (retrieveOAuthBtn) {
+        retrieveOAuthBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (!oauthSessionId) {
+                addLog('Error: No active OAuth session. Please login again.');
+                updateStatus('error', 'No active OAuth session');
+                return;
+            }
+            
+            const appNamespace = document.getElementById('appSelect').value;
+            const selectedOption = document.getElementById('appSelect').options[document.getElementById('appSelect').selectedIndex];
+            const appName = selectedOption.dataset.appName || selectedOption.text;
+            const instanceUrl = document.getElementById('instanceUrl').value.trim();
+            
+            if (!instanceUrl.startsWith('https://')) {
+                addLog('Error: Instance URL must start with https://');
+                updateStatus('error', 'Invalid instance URL format');
+                return;
+            }
+            
+            logOutput.textContent = '';
+            retrieveOAuthBtn.disabled = true;
+            terminateBtn.disabled = false;
+            updateStatus('starting');
+            
+            addLog('Starting metadata extraction (OAuth2 Flow)...');
+            addLog('Instance URL: ' + instanceUrl);
+            if (appNamespace && appNamespace !== 'all') {
+                addLog('Selected App: ' + appName);
+            } else {
+                addLog('Selected App: All Objects (No Filter)');
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('session_id', oauthSessionId);
+                formData.append('app_namespace', appNamespace || 'all');
+                formData.append('app_name', appName || 'AllObjects');
+                
+                const response = await fetch('/start-extraction', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: response.statusText }));
+                    throw new Error(errorData.detail || 'Failed to start extraction');
+                }
+                
+                const data = await response.json();
+                currentProcessId = data.process_id;
+                // Store process ID in sessionStorage for Lucidchart page
+                sessionStorage.setItem('latest_process_id', currentProcessId);
+                addLog('Process started. Process ID: ' + currentProcessId);
+                startStatusPolling(currentProcessId);
+                
+                // Clear session_id after successful start
+                oauthSessionId = null;
+            } catch (error) {
+                addLog('Error starting extraction: ' + error.message);
+                updateStatus('error', error.message);
+                retrieveOAuthBtn.disabled = false;
+                terminateBtn.disabled = true;
+            }
+        });
+    }
+    
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const authMethod = document.querySelector('input[name="authMethod"]:checked').value;
+        const clientId = document.getElementById('clientId').value.trim();
+        const clientSecret = document.getElementById('clientSecret').value.trim();
+        const instanceUrl = document.getElementById('instanceUrl').value.trim();
+        
+        // Validate common fields
+        if (!clientId || !clientSecret || !instanceUrl) {
+            addLog('Error: Please fill in Client ID, Client Secret, and Instance URL.');
+            updateStatus('error', 'Missing required fields');
+            return;
+        }
+        
+        // Validate instance URL format
+        if (!instanceUrl.startsWith('https://')) {
+            addLog('Error: Instance URL must start with https://');
+            updateStatus('error', 'Invalid instance URL format');
+            return;
+        }
+        
+        if (authMethod === 'password') {
+            // Password Flow
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                addLog('Error: Please fill in Username and Password for Password Flow.');
+                updateStatus('error', 'Missing username or password');
+                return;
+            }
+            
+            const appNamespace = document.getElementById('appSelect').value;
+            const formData = new FormData(form);
+            if (appNamespace && appNamespace !== 'all') {
+                formData.append('app_namespace', appNamespace);
+                const selectedOption = document.getElementById('appSelect').options[document.getElementById('appSelect').selectedIndex];
+                const appName = selectedOption.dataset.appName || selectedOption.text;
+                formData.append('app_name', appName);
+            } else {
+                formData.append('app_name', 'AllObjects');
+            }
+            logOutput.textContent = '';
+            retrieveBtn.disabled = true;
+            terminateBtn.disabled = false;
+            updateStatus('starting');
+            
+            addLog('Submitting credentials to start process (Password Flow)...');
+            addLog('Instance URL: ' + instanceUrl);
+            if (appNamespace && appNamespace !== 'all') {
+                const selectedOption = document.getElementById('appSelect').options[document.getElementById('appSelect').selectedIndex];
+                const appName = selectedOption.dataset.appName || selectedOption.text;
+                addLog('Selected App: ' + appName);
+            } else {
+                addLog('Selected App: All Objects (No Filter)');
+            }
+
+            try {
+                const response = await fetch('/start', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: response.statusText }));
+                    addLog('Error starting process: ' + (errorData.detail || errorData.error || 'Unknown error'));
+                    updateStatus('error', errorData.detail || 'Failed to start process');
+                    retrieveBtn.disabled = false;
+                    terminateBtn.disabled = true;
+                    return;
+                }
+                
+                const data = await response.json();
+                currentProcessId = data.process_id;
+                // Store process ID in sessionStorage for Lucidchart page
+                sessionStorage.setItem('latest_process_id', currentProcessId);
+                addLog('Process started. Process ID: ' + currentProcessId);
+                startStatusPolling(currentProcessId);
+            } catch (error) {
+                addLog('Error starting process: ' + error.message);
+                updateStatus('error', error.message);
+                retrieveBtn.disabled = false;
+                terminateBtn.disabled = true;
+            }
+        } else {
+            // OAuth2 Flow - Initiate authentication
+            logOutput.textContent = '';
+            retrieveBtn.disabled = true;
+            if (retrieveOAuthBtn) {
+                retrieveOAuthBtn.style.display = 'none';
+            }
+            updateStatus('starting');
+            
+            addLog('Initiating OAuth2 authentication flow...');
+            addLog('Instance URL: ' + instanceUrl);
+            addLog('You will be redirected to Salesforce login page in this window.');
+            addLog('On the Salesforce page: Enter your username, password, and MFA verification code.');
+            addLog('The MFA code will be sent to your email or authenticator app.');
+            addLog('After authentication, you will be redirected back and apps will be loaded automatically.');
+
+            try {
+                const appNamespace = document.getElementById('appSelect').value;
+                const authRequestUrl = `/salesforce-auth?client_id=${encodeURIComponent(clientId)}&client_secret=${encodeURIComponent(clientSecret)}&instance_url=${encodeURIComponent(instanceUrl)}${appNamespace && appNamespace !== 'all' ? '&app_namespace=' + encodeURIComponent(appNamespace) : ''}`;
+                const response = await fetch(authRequestUrl);
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: response.statusText }));
+                    addLog('Error initiating OAuth: ' + (errorData.detail || errorData.error || 'Unknown error'));
+                    updateStatus('error', errorData.detail || 'Failed to initiate OAuth');
+                    retrieveBtn.disabled = false;
+                    return;
+                }
+                
+                const data = await response.json();
+                const salesforceAuthUrl = data.auth_url;
+                
+                addLog('Redirecting to Salesforce login page...');
+                addLog('You will be redirected to Salesforce to complete authentication.');
+                addLog('After authentication, you will be redirected back and apps will be loaded automatically.');
+                
+                // Redirect to Salesforce OAuth URL (will redirect back to callback)
+                window.location.href = salesforceAuthUrl;
+            } catch (error) {
+                addLog('Error initiating OAuth: ' + error.message);
+                updateStatus('error', error.message);
+                retrieveBtn.disabled = false;
+                if (retrieveOAuthBtn) {
+                    retrieveOAuthBtn.style.display = 'none';
+                }
+            }
+        }
+    });
+
+    // Sign Out functionality - clears session and resets form for both flows
+    if (signOutBtn) {
+        signOutBtn.addEventListener('click', async () => {
+            if (confirm('Are you sure you want to sign out? This will clear your current session and reset the form.')) {
+                // Clear OAuth session
+                oauthSessionId = null;
+                
+                // Clear sessionStorage
+                sessionStorage.removeItem('latest_process_id');
+                sessionStorage.removeItem('google_drive_token');
+                
+                // Reset form
+                form.reset();
+                
+                // Reset app dropdown
+                const appSelect = document.getElementById('appSelect');
+                if (appSelect) {
+                    appSelect.innerHTML = '<option value="all">All Objects (No Filter)</option>';
+                }
+                
+                // Clear load apps status
+                const loadAppsStatus = document.getElementById('loadAppsStatus');
+                if (loadAppsStatus) {
+                    loadAppsStatus.style.display = 'none';
+                    loadAppsStatus.textContent = '';
+                }
+                
+                // Reset buttons based on current auth method
+                retrieveBtn.style.display = 'inline-block';
+                retrieveBtn.disabled = false;
+                if (authMethodPassword && authMethodPassword.checked) {
+                    retrieveBtn.textContent = 'Retrieve Selected App Data Model';
+                    if (loginLoadAppsBtn) {
+                        loginLoadAppsBtn.style.display = 'inline-block';
+                    }
+                } else {
+                    retrieveBtn.textContent = '🔐 Login & Load Apps';
+                }
+                
+                if (retrieveOAuthBtn) {
+                    retrieveOAuthBtn.style.display = 'none';
+                    retrieveOAuthBtn.disabled = true;
+                }
+                
+                signOutBtn.style.display = 'none';
+                terminateBtn.disabled = true;
+                
+                // Clear logs
+                logOutput.textContent = '';
+                
+                // Reset status
+                updateStatus('idle', '');
+                
+                // Clear process ID
+                currentProcessId = null;
+                
+                // Stop any polling
+                if (statusCheckInterval) {
+                    clearInterval(statusCheckInterval);
+                    statusCheckInterval = null;
+                }
+                
+                // Reset instance URL to default based on environment
+                if (environmentSelect && instanceUrlInput) {
+                    const selectedEnv = environmentSelect.value;
+                    const instanceUrl = envUrls[selectedEnv] || envUrls['DEV'];
+                    instanceUrlInput.value = instanceUrl;
+                    if (instanceUrlValue) {
+                        instanceUrlValue.textContent = instanceUrl;
+                    }
+                }
+                
+                addLog('✅ Signed out successfully. Session cleared and form reset.');
+            }
+        });
+    }
+
+    terminateBtn.addEventListener('click', async () => {
+        if (!currentProcessId) return;
+        
+        try {
+            const response = await fetch(`/terminate/${currentProcessId}`, {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            if (data.status === 'terminated') {
+                addLog('Terminate request sent.');
+            }
+        } catch (error) {
+            addLog('Error terminating process: ' + error.message);
+        }
+    });
+
+    function showDownloadButtons(processId, data) {
+        const downloadSection = document.getElementById('downloadSection');
+        const downloadMetadataBtn = document.getElementById('downloadMetadataBtn');
+        const downloadLucidBtn = document.getElementById('downloadLucidBtn');
+        const uploadDriveBtn = document.getElementById('uploadDriveBtn');
+        
+        if (data.has_metadata_file) {
+            downloadMetadataBtn.href = `/download/${processId}/metadata`;
+            downloadMetadataBtn.style.display = 'inline-block';
+        }
+        
+        if (data.has_lucid_file) {
+            downloadLucidBtn.href = `/download/${processId}/lucid`;
+            downloadLucidBtn.style.display = 'inline-block';
+            uploadDriveBtn.style.display = 'inline-block';
+            // Update sessionStorage with latest process ID for Lucidchart page
+            sessionStorage.setItem('latest_process_id', processId);
+        }
+        
+        downloadSection.style.display = 'block';
+    }
+
+    document.getElementById('uploadDriveBtn').addEventListener('click', async () => {
+        if (!currentProcessId) return;
+        
+        const uploadBtn = document.getElementById('uploadDriveBtn');
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Authenticating...';
+        
+        try {
+            // Check if we already have a token
+            let accessToken = sessionStorage.getItem('google_drive_token');
+            
+            if (!accessToken) {
+                // Get Google Drive auth URL
+                try {
+                    const authResponse = await fetch('/google-drive-auth');
+                    
+                    if (!authResponse.ok) {
+                        const errorData = await authResponse.json().catch(() => ({ detail: authResponse.statusText }));
+                        addLog('Error: ' + (errorData.detail || errorData.error || 'Failed to get Google Drive auth URL'));
+                        uploadBtn.disabled = false;
+                        uploadBtn.textContent = '☁️ Upload to Google Drive';
+                        return;
+                    }
+                    
+                    const authData = await authResponse.json();
+                    
+                    if (authData.error) {
+                        addLog('Error: ' + authData.error);
+                        if (authData.detail) {
+                            addLog('Details: ' + authData.detail);
+                        }
+                        uploadBtn.disabled = false;
+                        uploadBtn.textContent = '☁️ Upload to Google Drive';
+                        return;
+                    }
+                    
+                    if (!authData.auth_url) {
+                        addLog('Error: No auth URL received from server');
+                        uploadBtn.disabled = false;
+                        uploadBtn.textContent = '☁️ Upload to Google Drive';
+                        return;
+                    }
+                
+                // Open OAuth2 popup
+                const width = 600;
+                const height = 700;
+                const left = (screen.width - width) / 2;
+                const top = (screen.height - height) / 2;
+                
+                const popup = window.open(
+                    authData.auth_url,
+                    'Google Drive Auth',
+                    `width=${width},height=${height},left=${left},top=${top}`
+                );
+                
+                addLog('Please complete Google Drive authentication in the popup window.');
+                
+                    // Poll for token in sessionStorage (set by callback page)
+                    const tokenCheck = setInterval(() => {
+                        accessToken = sessionStorage.getItem('google_drive_token');
+                        if (accessToken) {
+                            clearInterval(tokenCheck);
+                            if (popup) popup.close();
+                            performUpload(accessToken);
+                        } else if (popup.closed) {
+                            clearInterval(tokenCheck);
+                            uploadBtn.disabled = false;
+                            uploadBtn.textContent = '☁️ Upload to Google Drive';
+                            addLog('Authentication cancelled or failed.');
+                        }
+                    }, 500);
+                } catch (fetchError) {
+                    addLog('Error fetching Google Drive auth URL: ' + fetchError.message);
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = '☁️ Upload to Google Drive';
+                    return;
+                }
+            } else {
+                performUpload(accessToken);
+            }
+        } catch (error) {
+            addLog('Error initiating Google Drive upload: ' + error.message);
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = '☁️ Upload to Google Drive';
+        }
+        
+        async function performUpload(token) {
+            uploadBtn.textContent = 'Uploading...';
+            addLog('Uploading file to Google Drive...');
+            
+            try {
+                const response = await fetch(`/upload-to-drive/${currentProcessId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ access_token: token })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    if (data.requires_auth) {
+                        // Clear token and retry
+                        sessionStorage.removeItem('google_drive_token');
+                        uploadBtn.disabled = false;
+                        uploadBtn.textContent = '☁️ Upload to Google Drive';
+                        addLog('Authentication required. Please try again.');
+                    } else {
+                        addLog('Upload error: ' + data.error);
+                        uploadBtn.disabled = false;
+                        uploadBtn.textContent = '☁️ Upload to Google Drive';
+                    }
+                } else if (data.success) {
+                    addLog('File uploaded successfully to Google Drive!');
+                    addLog('File ID: ' + data.file_id);
+                    if (data.web_view_link) {
+                        addLog('View file: ' + data.web_view_link);
+                    }
+                    uploadBtn.textContent = '✓ Uploaded to Google Drive';
+                    uploadBtn.style.backgroundColor = '#28a745';
+                }
+            } catch (error) {
+                addLog('Error uploading file: ' + error.message);
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '☁️ Upload to Google Drive';
+            }
+        }
+    });
+
+</script>
+{% endblock %}
+

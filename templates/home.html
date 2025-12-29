@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Salesforce Data Model Exporter{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 style="text-align: center; color: #1798c1; margin-bottom: 30px; font-size: 32px;">
+        Welcome to Salesforce Data Model Exporter
+    </h1>
+    
+    <div style="text-align: center; margin-bottom: 40px; font-size: 18px; color: #555; line-height: 1.8;">
+        <p>Extract, visualize, and understand your Salesforce data models with ease.</p>
+        <p>Transform complex Salesforce metadata into clear, actionable insights.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 40px;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <h2 style="margin-bottom: 15px; font-size: 24px;">🚀 Quick Start</h2>
+            <p style="margin-bottom: 20px; line-height: 1.6;">Get started by exporting your Salesforce data model in just a few clicks.</p>
+            <a href="/exporter" style="display: inline-block; background-color: white; color: #667eea; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; transition: transform 0.2s;">
+                Start Exporting →
+            </a>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 30px; border-radius: 10px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <h2 style="margin-bottom: 15px; font-size: 24px;">✨ Features</h2>
+            <p style="margin-bottom: 20px; line-height: 1.6;">Discover all the powerful features that make data model extraction simple.</p>
+            <a href="/features" style="display: inline-block; background-color: white; color: #f5576c; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; transition: transform 0.2s;">
+                View Features →
+            </a>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 30px; border-radius: 10px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <h2 style="margin-bottom: 15px; font-size: 24px;">📊 Lucidchart Integration</h2>
+            <p style="margin-bottom: 20px; line-height: 1.6;">Learn how to import your data models into Lucidchart for visualization.</p>
+            <a href="/lucidchart" style="display: inline-block; background-color: white; color: #4facfe; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; transition: transform 0.2s;">
+                Learn More →
+            </a>
+        </div>
+    </div>
+
+    <div style="background-color: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
+        <h2 style="color: #1798c1; margin-bottom: 20px; font-size: 28px;">What is Salesforce Data Model Exporter?</h2>
+        <p style="line-height: 1.8; color: #555; font-size: 16px; margin-bottom: 15px;">
+            This is a lightweight application that helps you extract data models from existing Salesforce solutions, 
+            including various orgs like Org62, OrgSF, Finance Force, etc. The tool exports the data model into a 
+            readable CSV file that can be easily imported into visualization tools.
+        </p>
+        <p style="line-height: 1.8; color: #555; font-size: 16px;">
+            In addition, the generated CSV is Lucidchart-compatible, meaning if you export this file into Lucidchart 
+            through an ERD import option, the entire data model will be rendered into Lucidchart with drag and drop 
+            functionality, making it easy to visualize and understand your Salesforce data structure.
+        </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+        <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 48px; margin-bottom: 10px;">🔐</div>
+            <h3 style="color: #1798c1; margin-bottom: 10px;">Secure</h3>
+            <p style="color: #666;">Your credentials are processed securely and never stored.</p>
+        </div>
+        <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 48px; margin-bottom: 10px;">⚡</div>
+            <h3 style="color: #1798c1; margin-bottom: 10px;">Fast</h3>
+            <p style="color: #666;">Quick extraction of metadata from your Salesforce org.</p>
+        </div>
+        <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 48px; margin-bottom: 10px;">📈</div>
+            <h3 style="color: #1798c1; margin-bottom: 10px;">Comprehensive</h3>
+            <p style="color: #666;">Extract all objects, fields, and relationships.</p>
+        </div>
+        <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 48px; margin-bottom: 10px;">🎨</div>
+            <h3 style="color: #1798c1; margin-bottom: 10px;">Visual</h3>
+            <p style="color: #666;">Export to Lucidchart for beautiful ERD diagrams.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

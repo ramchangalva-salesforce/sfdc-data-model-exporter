@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Salesforce Data Model Exporter{% endblock %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0ffff;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .top-header {
+            background-color: #1798c1;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .salesforce-logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .app-title {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        nav a.active {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="top-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="https://www.salesforce.com/content/dam/sfdc-docs/www/logos/logo-salesforce.svg" 
+                     alt="Salesforce Logo" 
+                     class="salesforce-logo"
+                     onerror="this.onerror=null; this.src='/static/salesforce-logo.svg';">
+                <span class="app-title">Salesforce Data Model Exporter</span>
+            </div>
+            <nav>
+                <a href="/" id="nav-home">Home</a>
+                <a href="/features" id="nav-features">Features</a>
+                <a href="/exporter" id="nav-exporter">Data Model Exporter</a>
+                <a href="/lucidchart" id="nav-lucidchart">Lucidchart & ERD</a>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        {% block content %}{% endblock %}
+    </div>
+
+    {% block extra_js %}{% endblock %}
+    <script>
+        // Set active navigation based on current path
+        const currentPath = window.location.pathname;
+        const navLinks = {
+            '/': 'nav-home',
+            '/features': 'nav-features',
+            '/exporter': 'nav-exporter',
+            '/lucidchart': 'nav-lucidchart'
+        };
+        
+        if (navLinks[currentPath]) {
+            const activeLink = document.getElementById(navLinks[currentPath]);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
+
